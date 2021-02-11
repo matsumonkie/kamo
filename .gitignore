@@ -2,3 +2,4 @@ node_modules
 dist/**
 .vscode/
 release.json
+config/prod.json
