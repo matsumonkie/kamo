@@ -83,7 +83,7 @@ app.get('/post', async (_request, response) => {
 });
 
 
-app.get('/new', (_request, response) => {
+app.get('/post/new', (_request, response) => {
   response.render('new', {
     title: 'new'
   });

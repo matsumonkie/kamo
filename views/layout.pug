@@ -2,7 +2,10 @@ html
   head
     title Bliff - #{title}
   body
-    block app  
+    .menu: ul
+      li: a(href='/post/new') create new post
+      li: a(href='/') index
+
+    block app
 
 block script
-  
