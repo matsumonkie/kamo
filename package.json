@@ -1,4 +1,5 @@
 {
+  "version": "0.1.0",
   "name": "bliff",
   "scripts": {
     "migrate": "node-pg-migrate --config-file=config/default.json",
