@@ -5,7 +5,7 @@ import * as Pg from 'pg';
 import * as Editor from './Editor';
 import * as TextEditor from './TextEditor';
 
-const port = 8080;
+const port = process.env.PORT;
 const app = express();
 
 app.engine('pug', require('pug').__express)
