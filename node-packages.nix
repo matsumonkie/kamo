@@ -7429,13 +7429,13 @@ let
         sha1 = "925d2601d39ac485e091cf0da5c6e694dc3dcaff";
       };
     };
-    "resolve-1.19.0" = {
+    "resolve-1.20.0" = {
       name = "resolve";
       packageName = "resolve";
-      version = "1.19.0";
+      version = "1.20.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/resolve/-/resolve-1.19.0.tgz";
-        sha512 = "rArEXAgsBG4UgRGcynxWIWKFvh/XZCcS8UJdHhwy91zwAvCZIbcs+vAbflgBnNjYMs/i/i+/Ux6IZhML1yPvxg==";
+        url = "https://registry.npmjs.org/resolve/-/resolve-1.20.0.tgz";
+        sha512 = "wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A==";
       };
     };
     "resolve-cwd-2.0.0" = {
@@ -10662,7 +10662,7 @@ let
       sources."require-from-string-2.0.2"
       sources."require-main-filename-2.0.0"
       sources."requires-port-1.0.0"
-      sources."resolve-1.19.0"
+      sources."resolve-1.20.0"
       (sources."resolve-cwd-2.0.0" // {
         dependencies = [
           sources."resolve-from-3.0.0"
