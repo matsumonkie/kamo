@@ -18,10 +18,7 @@ let
       name = "bliff";
       buildInputs = with pkgs; [ nodejs-14_x ];
       phases = ["unpackPhase" "buildPhase"];
-
-      src = fetchFromGitHub {
-        inherit (release) owner repo rev sha256;
-      };
+      src = ./.;
 
       buildPhase = ''
         ln -s ${nodeDependencies}/lib/node_modules ./node_modules
