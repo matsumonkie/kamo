@@ -1,0 +1,9 @@
+extends layout.pug
+
+block app
+  #app(data-post-id=postId)
+
+block script
+  include post
+  +post()
+  

@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "outDir": "./dist",
+    "lib": [
+      "es5",
+      "es6",
+      "dom",
+      "es2015.collection",
+      "DOM.Iterable",
+      "es2015.promise",
+      "ESNext.Array"
+    ],
+    "types": [],
+    "baseUrl": "./node_modules",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
