@@ -40,9 +40,7 @@ let
         done
       '';
 
-
       buildPhase = ''
-ls **/*
         ln -s ${nodeDependencies}/lib/node_modules ./node_modules
         export PATH="${nodeDependencies}/bin:$PATH"
         webpack
