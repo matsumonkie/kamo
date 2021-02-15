@@ -11,7 +11,8 @@ const app = express();
 app.engine('pug', require('pug').__express)
 app.use(express.static('dist'));
 app.use(express.json());
-app.set('view engine', 'pug')
+app.set('view engine', 'pug');
+app.set('views', path.join('./source/views'));
 
 app.get('/', (_request, response) => {
   response.redirect("/index.html");
@@ -82,7 +83,6 @@ app.get('/post', async (_request, response) => {
   });
 });
 
-
 app.get('/post/new', (_request, response) => {
   response.render('new', {
     title: 'new'
@@ -144,16 +144,22 @@ app.put('/post/:id/unpublish', async (request, response) => {
 
 app.get('/post/:id', async (request, response) => {
   const postId = request.params.id;
-  const client = new Pg.Client(Config);
-  await client.connect()
-  const sql = 'SELECT body, published FROM post WHERE id = $1;';
-  const values = [postId];
+  if(request.accepts('html')) {
+    response.render('show', {
+      title: 'index',
+    });
+  } else {
+    const client = new Pg.Client(Config);
+    await client.connect()
+    const sql = 'SELECT body, published FROM post WHERE id = $1;';
+    const values = [postId];
 
-  const { body, published } = (await client.query(sql, values)).rows[0];
-  response.json({
-    editors: body.editors,
-    published
-  });
+    const { body, published } = (await client.query(sql, values)).rows[0];
+    response.json({
+      editors: body.editors,
+      published
+    });
+  }
 });
 
 app.listen(port, () => {

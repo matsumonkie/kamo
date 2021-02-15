@@ -4,8 +4,10 @@ block app
   #app
     ul
       each post in posts
-        li
-          a(href='/post/edit/' + post.id)= post.title
+        li.row
+          span #{post.title}
+          a(href='/post/edit/' + post.id) edit
+          a(href='/post/' + post.id) view
 
 block script
   include posts
