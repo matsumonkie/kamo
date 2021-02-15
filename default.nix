@@ -10,6 +10,12 @@ let
     };
   in import pinnedPkgs {};
 
+  eslintrc = builtins.path { path = ./.eslintrc.js;
+                             name = "eslintrc";
+                           };
+
+  srcs = pkgs.lib.sourceFilesBySuffices ./source [ ".js" ".ts" ".tsx" ".css" ".pug" ];
+
   nodeDependencies =
     (pkgs.callPackage ./release.nix { inherit pkgs; }).shell.nodeDependencies;
 
@@ -18,9 +24,25 @@ let
       name = "bliff";
       buildInputs = with pkgs; [ nodejs-14_x ];
       phases = ["unpackPhase" "buildPhase"];
-      src = ./.;
+      src = [
+        eslintrc
+        srcs
+        ./migrations
+        ./package.json
+        ./package-lock.json
+        ./tsconfig.json
+        ./webpack.config.js
+      ];
+
+      unpackPhase = ''
+        for srcFile in $src; do
+          cp -r $srcFile $(stripHash $srcFile)
+        done
+      '';
+
 
       buildPhase = ''
+ls **/*
         ln -s ${nodeDependencies}/lib/node_modules ./node_modules
         export PATH="${nodeDependencies}/bin:$PATH"
         webpack

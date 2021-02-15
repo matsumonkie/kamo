@@ -3,7 +3,7 @@
   "name": "bliff",
   "scripts": {
     "migrate": "node-pg-migrate --config-file=config/default.json",
-    "eslint": "npx eslint src/ --ext .js,.jsx,.ts,.tsx",
+    "eslint": "npx eslint source/ --ext .js,.jsx,.ts,.tsx",
     "server": "npx node dist/server.bundle.js",
     "start": "npx webpack-dev-server",
     "dev-watch": "npx nodemon dist/server.bundle.js",

@@ -7,8 +7,8 @@ module.exports = {
   mode: 'development',
   target: 'node',
   entry: {
-    server: './src/Server.ts',
-    post: './src/Post.tsx',
+    server: './source/Server.ts',
+    post: './source/Post.tsx',
     'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
     'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
     'css.worker': 'monaco-editor/esm/vs/language/css/css.worker',
