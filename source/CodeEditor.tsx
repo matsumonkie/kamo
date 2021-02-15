@@ -1,5 +1,6 @@
 import React from 'react';
 import Editor from '@monaco-editor/react';
+import * as State from './State';
 
 type Model = {
   type: 'code';
@@ -21,7 +22,7 @@ interface Update {
   update: (model: Model) => void
 }
 
-const App = ({ update, ...model }: Model & Update): JSX.Element => {
+const App = ({ update, state, ...model }: { state: State.Model } & Model & Update): JSX.Element => {
   const updateFilename = (event): void => {
     const newModel: Model = {
       ...model,
@@ -46,21 +47,31 @@ const App = ({ update, ...model }: Model & Update): JSX.Element => {
     update(newModel);
   };
 
+  const codeEditorNavBar = (): JSX.Element => {
+    if (state.type == "show") {
+      return undefined;
+    } else {
+      return (
+        <div className="row">
+          <label>
+            {' '}
+      File name:
+      <input type="text" value={model.filename} onChange={updateFilename} />
+          </label>
+          <label>
+            {' '}
+      Language:
+      <input type="text" value={model.language} onChange={updateLanguage} />
+          </label>
+        </div>
+      );
+    }
+  }
+
   const view = () => (
     <>
       <h1>{model.id}</h1>
-      <div className="row">
-        <label>
-          {' '}
-          File name:
-          <input type="text" value={model.filename} onChange={updateFilename} />
-        </label>
-        <label>
-          {' '}
-          Language:
-          <input type="text" value={model.language} onChange={updateLanguage} />
-        </label>
-      </div>
+      {codeEditorNavBar()}
 
       <Editor
         height="10vh"
@@ -79,3 +90,4 @@ const App = ({ update, ...model }: Model & Update): JSX.Element => {
 export {
   App, Model, Update, mkModel,
 };
+

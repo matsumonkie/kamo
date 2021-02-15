@@ -5,8 +5,6 @@ type Model = {
   content: string;
 }
 
-console.log(Marked);
-
 const App = ({ ...model }: Model): JSX.Element => {
   const markdown: string = Marked.parse(model.content);
 

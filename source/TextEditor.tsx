@@ -1,6 +1,7 @@
 import React from 'react';
 import Editor from '@monaco-editor/react';
 import * as MarkdownPreview from './MarkdownPreview';
+import * as State from './State';
 
 type Model = {
   type: 'text';
@@ -18,7 +19,7 @@ interface Update {
   update: (model: Model) => void
 }
 
-const App = ({ update, ...model }: Model & Update): JSX.Element => {
+const App = ({ update, state, ...model }: { state: State.Model } & Model & Update): JSX.Element => {
   const handleEditorChange = (value) => {
     const newModel: Model = {
       ...model,
@@ -27,9 +28,11 @@ const App = ({ update, ...model }: Model & Update): JSX.Element => {
     update(newModel);
   };
 
-  const view = () => (
-    <>
-      <div className="text-editor-container">
+  const editView = (): JSX.Element => {
+    if (state.type == "show") {
+      return undefined;
+    } else {
+      return (
         <Editor
           height="10vh"
           defaultLanguage="markdown"
@@ -41,6 +44,13 @@ const App = ({ update, ...model }: Model & Update): JSX.Element => {
             }
           }
         />
+      )
+    }
+  }
+  const view = () => (
+    <>
+      <div className="text-editor-container">
+        {editView()}
         <MarkdownPreview.App {...model} />
       </div>
     </>

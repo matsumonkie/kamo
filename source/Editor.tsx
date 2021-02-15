@@ -3,20 +3,23 @@ import React from 'react';
 import * as CodeEditor from './CodeEditor';
 import * as TextEditor from './TextEditor';
 import * as DiffEditor from './DiffEditor';
+import * as State from './State';
 
-type Model =
+type Editor =
   | TextEditor.Model
   | CodeEditor.Model
   | DiffEditor.Model;
 
-const isTextEditor = (editor: Model): editor is TextEditor.Model => editor.type === 'text';
+type Model = Editor & { state: State.Model }
+
+const isTextEditor = (editor: Editor): editor is TextEditor.Model => editor.type === 'text';
 
 interface Delete {
   del: (id: number) => void
 }
 
 interface Update {
-  update: (model: Model) => void
+  update: (editor: Editor) => void
 }
 
 interface Delete {
@@ -36,10 +39,10 @@ interface AddTextEditor {
 }
 
 const App = ({
-  update, del, addCodeEditor, addDiffEditor, addTextEditor, editors, state, ...model
-}:
-  { editors: Model[], state: any } & Model & Delete & Update & AddDiffEditor & AddCodeEditor & AddTextEditor)
+  update, del, addCodeEditor, addDiffEditor, addTextEditor, editors, ...model
+}: { editors: Editor[] } & Model & Delete & Update & AddDiffEditor & AddCodeEditor & AddTextEditor)
   : JSX.Element => {
+  console.log(`view: ${model.state.type}`)
   const updateCodeEditor: CodeEditor.Update = {
     update: (newEditor: CodeEditor.Model): void => {
       update(newEditor);
@@ -88,12 +91,14 @@ const App = ({
   const view = (): JSX.Element => (
     <>
       {editorView()}
-      <div className="row">
-        <button onClick={onDeleteEditor}> XX</button>
-        <button onClick={() => addCodeEditor(model.id)}>Write code</button>
-        {editCodeView()}
-        <button onClick={() => addTextEditor(model.id)}>Write Markdown</button>
-      </div>
+      {model.state.type != "show" &&
+        <div className="row">
+          <button onClick={onDeleteEditor}> XX</button>
+          <button onClick={() => addCodeEditor(model.id)}>Write code</button>
+          {editCodeView()}
+          <button onClick={() => addTextEditor(model.id)}>Write Markdown</button>
+        </div>
+      }
     </>
   );
 
@@ -101,5 +106,5 @@ const App = ({
 };
 
 export {
-  App, Model, Delete, Update, AddTextEditor, AddCodeEditor, AddDiffEditor, isTextEditor
+  App, Editor, Model, Delete, Update, AddTextEditor, AddCodeEditor, AddDiffEditor, isTextEditor
 };

@@ -3,36 +3,24 @@ import * as Editor from './Editor';
 import * as CodeEditor from './CodeEditor';
 import * as TextEditor from './TextEditor';
 import * as DiffEditor from './DiffEditor';
-import { response } from 'express';
+import * as State from './State';
 
 interface Model {
-  editors: Editor.Model[],
-  state: State
+  editors: Editor.Editor[],
+  state: State.Model
 }
-
-type State =
-  | Edited
-  | New
-
-interface Edited {
-  type: "edited"
-  id: number
-  published: boolean
-}
-interface New {
-  type: "new"
-}
-
-const isEdited = (state: State): state is Edited => state.type === 'edited';
 
 const mkId = (): number => Math.floor(Math.random() * Math.floor(1000));
 
-const defaultModel = (): Model => ({
-  editors: [TextEditor.mkModel(mkId())],
-  state: { type: "new" }
-});
+const defaultModel = (): Model => {
+  return {
+    editors: [TextEditor.mkModel(mkId())],
+    state: { type: "new" }
+  }
+};
 
-const getModelForPostId = (postId: number): Promise<Model> => {
+const getModelForPostId = (postId: number, isShowMode: boolean): Promise<Model> => {
+
   return fetch(`/post/${postId}`, {
     method: 'GET',
     headers: {
@@ -41,19 +29,30 @@ const getModelForPostId = (postId: number): Promise<Model> => {
     }
   }).then((response) => response.json())
     .then((json) => {
-      const { published, ...rest } = json
-      return {
-        ...rest,
-        state: {
-          type: "edited",
-          id: postId,
-          published
+      const { published, ...modelWithoutState } = json
+
+      if (isShowMode) {
+        return {
+          ...modelWithoutState,
+          state: {
+            type: "show",
+            id: postId
+          }
+        }
+      } else {
+        return {
+          ...modelWithoutState,
+          state: {
+            type: "edit",
+            id: postId,
+            published
+          }
         }
       }
     });
 }
 
-const removeEditorAndItsChildren = (editors: Editor.Model[], id: number): Editor.Model[] => editors.reduce((acc, editor) => {
+const removeEditorAndItsChildren = (editors: Editor.Editor[], id: number): Editor.Model[] => editors.reduce((acc, editor) => {
   if (editor.id == id) {
     return acc;
   } if ('previousEditorId' in editor && editor.previousEditorId == id) {
@@ -75,8 +74,8 @@ const App = (m: Model): JSX.Element => {
   const [model, setModel] = useState(m);
 
   const del = (id) => {
-    const editors: Editor.Model[] = removeEditorAndItsChildren(model.editors, id);
-    const newEditors: Editor.Model[] = (editors.length === 0) ? defaultModel().editors : editors;
+    const editors: Editor.Editor[] = removeEditorAndItsChildren(model.editors, id);
+    const newEditors: Editor.Editor[] = (editors.length === 0) ? defaultModel().editors : editors;
 
     setModel({
       ...model,
@@ -84,7 +83,7 @@ const App = (m: Model): JSX.Element => {
     });
   };
 
-  const insertAfterEditorId = (previousEditorId: number, editors: Editor.Model[], newEditor: Editor.Model): Editor.Model[] => editors.reduce((acc, editor) => {
+  const insertAfterEditorId = (previousEditorId: number, editors: Editor.Editor[], newEditor: Editor.Editor): Editor.Model[] => editors.reduce((acc, editor) => {
     if (editor.id == previousEditorId) {
       acc.push(editor, newEditor);
       return acc;
@@ -130,7 +129,7 @@ const App = (m: Model): JSX.Element => {
     })
   }
 
-  const publish = (state: Edited): void => {
+  const publish = (state: State.Edit): void => {
     save(state.id).then(() => {
       fetch(`/post/${state.id}/publish`, {
         method: 'PUT',
@@ -154,7 +153,7 @@ const App = (m: Model): JSX.Element => {
     })
   }
 
-  const unpublish = (state: Edited): void => {
+  const unpublish = (state: State.Edit): void => {
     fetch(`/post/${state.id}/unpublish`, {
       method: 'PUT',
       headers: {
@@ -207,33 +206,40 @@ const App = (m: Model): JSX.Element => {
   const editorsView = (): JSX.Element[] => model.editors.map((editor) => (
     <Editor.App
       {...model}
-      key={editor.id}
       {...editor}
+      key={editor.id}
+      editors={model.editors}
+      {...updateEditor}
       del={del}
       addCodeEditor={addCodeEditor}
       addDiffEditor={addDiffEditor}
       addTextEditor={addTextEditor}
-      {...updateEditor}
     />
   ));
 
-  const saveView = (): JSX.Element => {
+  const navBarView = (): JSX.Element => {
     const state = model.state;
-    if (isEdited(state)) {
-      return <button onClick={() => save(state.id)}>Save</button>
-    } else {
-      return <button onClick={() => create()}>Save</button>
-    }
-  }
+    var saveView: JSX.Element;
+    var publishView: JSX.Element;
 
-  const publishView = (): JSX.Element => {
-    const state = model.state;
-    if (isEdited(state)) {
+    if (State.isEditState(state)) {
+      saveView = <button onClick={() => save(state.id)}>Save</button>
       if (state.published) {
-        return <button onClick={() => unpublish(state)}>Unpublish</button>
+        publishView = <button onClick={() => unpublish(state)}>Unpublish</button>
       } else {
-        return <button onClick={() => publish(state)}>Publish</button>
+        publishView = <button onClick={() => publish(state)}>Publish</button>
       }
+    } else {
+      saveView = <button onClick={() => create()}>Save</button>
+    }
+
+    if (model.state.type != "show") {
+      return (
+        <div className="row">
+          {saveView}
+          {publishView}
+        </div>
+      )
     } else {
       return undefined;
     }
@@ -241,11 +247,7 @@ const App = (m: Model): JSX.Element => {
 
   return (
     <>
-      <div className="row">
-        {saveView()}
-        {publishView()}
-      </div>
-
+      {navBarView()}
       <div className="col">
         {editorsView()}
       </div>

@@ -144,9 +144,10 @@ app.put('/post/:id/unpublish', async (request, response) => {
 
 app.get('/post/:id', async (request, response) => {
   const postId = request.params.id;
-  if(request.accepts('html')) {
+  if (request.accepts('html')) {
     response.render('show', {
-      title: 'index',
+      title: 'show',
+      postId
     });
   } else {
     const client = new Pg.Client(Config);

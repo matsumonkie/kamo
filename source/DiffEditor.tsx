@@ -2,6 +2,7 @@ import React from 'react';
 import Editor, { DiffEditor } from '@monaco-editor/react';
 import * as CodeEditor from './CodeEditor';
 import * as MEditor from './Editor';
+import * as State from './State';
 
 type Model = {
   type: 'diff';
@@ -27,11 +28,11 @@ interface Update {
   update: (model: Model) => void
 }
 
-const isCodeEditor = (editor: MEditor.Model): editor is CodeEditor.Model => editor.type === 'code';
+const isCodeEditor = (editor: MEditor.Editor): editor is CodeEditor.Model => editor.type === 'code';
 
-const isDiffEditor = (editor: MEditor.Model): editor is Model => editor.type === 'diff';
+const isDiffEditor = (editor: MEditor.Editor): editor is Model => editor.type === 'diff';
 
-const findOrigCodeEditor = (previousEditorId: number, editors: MEditor.Model[]): CodeEditor.Model => {
+const findOrigCodeEditor = (previousEditorId: number, editors: MEditor.Editor[]): CodeEditor.Model => {
   const previousEditor = editors.find((editor) => editor.id == previousEditorId) as CodeEditor.Model | Model;
   if (isDiffEditor(previousEditor)) {
     return findOrigCodeEditor(previousEditor.previousEditorId, editors);
@@ -39,7 +40,7 @@ const findOrigCodeEditor = (previousEditorId: number, editors: MEditor.Model[]):
   return previousEditor as CodeEditor.Model;
 };
 
-const getDiffableEditors = (editors: MEditor.Model[]): DiffableEditor[] => {
+const getDiffableEditors = (editors: MEditor.Editor[]): DiffableEditor[] => {
   const findLatestDiffEditorId = (origCodeEditorId: number): number => editors.reduce((acc, editor) => {
     if (isDiffEditor(editor) && editor.previousEditorId == acc && editor.previousEditorId != origCodeEditorId) {
       return editor.id;
@@ -60,7 +61,7 @@ const getDiffableEditors = (editors: MEditor.Model[]): DiffableEditor[] => {
   }, []);
 };
 
-const App = ({ update, editors, ...model }: { editors: MEditor.Model[] } & Model & Update): JSX.Element => {
+const App = ({ update, editors, state, ...model }: { state: State.Model } & { editors: MEditor.Editor[] } & Model & Update): JSX.Element => {
   const origCodeEditor: CodeEditor.Model = findOrigCodeEditor(model.previousEditorId, editors);
   const previousEditor = editors.find((editor) => editor.id == model.previousEditorId) as CodeEditor.Model | Model;
   const diffableEditors: DiffableEditor[] = getDiffableEditors(editors);
@@ -102,20 +103,9 @@ const App = ({ update, editors, ...model }: { editors: MEditor.Model[] } & Model
     );
   };
 
-  const view = () => (
-    <>
-      {selectFileView()}
-      <h1>{model.id}</h1>
-      <div className="row">
-        <Editor
-          height="10vh"
-          defaultLanguage="javascript"
-          language={origCodeEditor.language}
-          defaultValue={previousEditor.content}
-          onChange={handleEditorChange}
-          options={{ minimap: { enabled: false } }}
-        />
-
+  const showModeView = (): JSX.Element => {
+    return (
+      <>
         <DiffEditor
           height="10vh"
           original={previousEditor.content}
@@ -128,9 +118,49 @@ const App = ({ update, editors, ...model }: { editors: MEditor.Model[] } & Model
             }
           }
         />
-      </div>
-    </>
-  );
+      </>
+    );
+  }
+
+  const editModeView = (): JSX.Element => {
+    return (
+      <>
+        {selectFileView()}
+        <h1>{model.id}</h1>
+        <div className="row">
+          <Editor
+            height="10vh"
+            defaultLanguage="javascript"
+            language={origCodeEditor.language}
+            defaultValue={previousEditor.content}
+            onChange={handleEditorChange}
+            options={{ minimap: { enabled: false } }}
+          />
+
+          <DiffEditor
+            height="10vh"
+            original={previousEditor.content}
+            modified={model.content}
+            language={origCodeEditor.language}
+            options={
+              {
+                readOnly: true,
+                minimap: { enabled: true },
+              }
+            }
+          />
+        </div>
+      </>
+    );
+  }
+
+  const view = () => {
+    if (state.type == "show") {
+      return showModeView();
+    } else {
+      return editModeView();
+    }
+  }
 
   return view();
 };
