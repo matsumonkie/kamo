@@ -70,7 +70,6 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
 
   const view = () => (
     <>
-      <h1>{model.id}</h1>
       {codeEditorNavBar()}
 
       <Editor

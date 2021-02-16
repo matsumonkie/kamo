@@ -89,7 +89,7 @@ app.get('/post/new', (_request, response) => {
   });
 });
 
-app.get('/post/edit/:id', (request, response) => {
+app.get('/post/:id/edit', (request, response) => {
   const postId = request.params.id;
   response.render('edit', {
     title: `edit post ${postId}`,

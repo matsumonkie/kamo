@@ -114,7 +114,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
           options={
             {
               readOnly: true,
-              minimap: { enabled: true },
+              minimap: { enabled: false },
             }
           }
         />
