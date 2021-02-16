@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import Editor from '@monaco-editor/react';
 import * as State from './State';
+import * as Util from './Util';
 
 type Model = {
   type: 'code';
@@ -23,6 +25,15 @@ interface Update {
 }
 
 const App = ({ update, state, ...model }: { state: State.Model } & Model & Update): JSX.Element => {
+  const editorRef = useRef(null);
+
+  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+    editorRef.current = editor;
+    const height = { minHeight: 100, maxHeight: 500 }
+    editor.onDidContentSizeChange(() => Util.updateEditorHeight(height, editor));
+    Util.updateEditorHeight(height, editor);
+  }
+
   const updateFilename = (event): void => {
     const newModel: Model = {
       ...model,
@@ -70,16 +81,23 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
 
   const view = () => (
     <>
-      {codeEditorNavBar()}
-
-      <Editor
-        height="10vh"
-        defaultLanguage="javascript"
-        language={model.language}
-        defaultValue={model.content}
-        onChange={handleEditorChange}
-        options={{ minimap: { enabled: false } }}
-      />
+      <div className="code-editor-container">
+        {codeEditorNavBar()}
+        <Editor
+          className="code-editor"
+          defaultLanguage="javascript"
+          language={model.language}
+          defaultValue={model.content}
+          onChange={handleEditorChange}
+          onMount={handleEditorDidMount}
+          options={
+            {
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false
+            }
+          }
+        />
+      </div>
     </>
   );
 

@@ -42,7 +42,6 @@ const App = ({
   update, del, addCodeEditor, addDiffEditor, addTextEditor, editors, ...model
 }: { editors: Editor[] } & Model & Delete & Update & AddDiffEditor & AddCodeEditor & AddTextEditor)
   : JSX.Element => {
-  console.log(`view: ${model.state.type}`)
   const updateCodeEditor: CodeEditor.Update = {
     update: (newEditor: CodeEditor.Model): void => {
       update(newEditor);

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Editor from '@monaco-editor/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import * as MarkdownPreview from './MarkdownPreview';
 import * as State from './State';
+import * as Util from './Util';
 
 type Model = {
   type: 'text';
@@ -20,6 +22,15 @@ interface Update {
 }
 
 const App = ({ update, state, ...model }: { state: State.Model } & Model & Update): JSX.Element => {
+  const editorRef = useRef(null);
+
+  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+    editorRef.current = editor;
+    const height = { minHeight: 100, maxHeight: 1000 }
+    editor.onDidContentSizeChange(() => Util.updateEditorHeight(height, editor));
+    Util.updateEditorHeight(height, editor);
+  }
+
   const handleEditorChange = (value) => {
     const newModel: Model = {
       ...model,
@@ -35,13 +46,15 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
       return (
         <div className="text-editor">
           <Editor
-            height="10vh"
             defaultLanguage="markdown"
             defaultValue={model.content}
+            onMount={handleEditorDidMount}
             onChange={handleEditorChange}
             options={
               {
                 minimap: { enabled: false },
+                scrollBeyondLastLine: false
+
               }
             }
           />

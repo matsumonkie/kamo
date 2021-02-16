@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { MutableRefObject, useRef, useState } from 'react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import Editor, { DiffEditor } from '@monaco-editor/react';
 import * as CodeEditor from './CodeEditor';
 import * as MEditor from './Editor';
 import * as State from './State';
+import * as Util from './Util';
 
 type Model = {
   type: 'diff';
@@ -62,9 +64,30 @@ const getDiffableEditors = (editors: MEditor.Editor[]): DiffableEditor[] => {
 };
 
 const App = ({ update, editors, state, ...model }: { state: State.Model } & { editors: MEditor.Editor[] } & Model & Update): JSX.Element => {
+  const [currentHeight, setHeight] = useState(100);
   const origCodeEditor: CodeEditor.Model = findOrigCodeEditor(model.previousEditorId, editors);
   const previousEditor = editors.find((editor) => editor.id == model.previousEditorId) as CodeEditor.Model | Model;
   const diffableEditors: DiffableEditor[] = getDiffableEditors(editors);
+
+  const editorRef: MutableRefObject<monaco.editor.IStandaloneCodeEditor> = useRef(null);
+  const diffEditorRef: MutableRefObject<monaco.editor.IStandaloneDiffEditor> = useRef(null);
+
+  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+    editorRef.current = editor;
+    const height = { minHeight: 100, maxHeight: 500 }
+    editor.onDidContentSizeChange(() => {
+      Util.updateEditorHeight(height, editor)
+    });
+    Util.updateEditorHeight(height, editor);
+  }
+
+  function handleDiffEditorDidMount(editor: monaco.editor.IStandaloneDiffEditor) {
+    diffEditorRef.current = editor;
+    const origHeight: number = diffEditorRef.current.getOriginalEditor().getContentHeight();
+    const modHeight: number = diffEditorRef.current.getModifiedEditor().getContentHeight();
+    const newHeight: number = Math.max(origHeight, modHeight);
+    setHeight(newHeight);
+  }
 
   const handleEditorChange = (value) => {
     const newModel: Model = {
@@ -103,24 +126,6 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
     );
   };
 
-  const showModeView = (): JSX.Element => {
-    return (
-      <>
-        <DiffEditor
-          height="10vh"
-          original={previousEditor.content}
-          modified={model.content}
-          language={origCodeEditor.language}
-          options={
-            {
-              readOnly: true,
-              minimap: { enabled: false },
-            }
-          }
-        />
-      </>
-    );
-  }
 
   const editModeView = (): JSX.Element => {
     return (
@@ -129,37 +134,64 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
         <h1>{model.id}</h1>
         <div className="row">
           <Editor
-            height="10vh"
             defaultLanguage="javascript"
             language={origCodeEditor.language}
             defaultValue={previousEditor.content}
             onChange={handleEditorChange}
-            options={{ minimap: { enabled: false } }}
-          />
-
-          <DiffEditor
-            height="10vh"
-            original={previousEditor.content}
-            modified={model.content}
-            language={origCodeEditor.language}
+            onMount={handleEditorDidMount}
             options={
               {
-                readOnly: true,
-                minimap: { enabled: true },
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                scrollBeyondLastColumn: 1
               }
             }
           />
+
+          {showModeView()}
         </div>
       </>
     );
   }
 
+  const showModeView = (): JSX.Element => {
+    const height = Math.min(currentHeight, 700);
+
+    return (
+      <>
+        <DiffEditor
+          className="diff-editor"
+          height={height}
+          original={previousEditor.content}
+          modified={model.content}
+          language={origCodeEditor.language}
+          onMount={handleDiffEditorDidMount}
+          options={
+            {
+              readOnly: true,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              scrollBeyondLastColumn: 1
+            }
+          }
+        />
+      </>
+    );
+  }
+
   const view = () => {
+    let editorView: JSX.Element;
     if (state.type == "show") {
-      return showModeView();
+      editorView = showModeView();
     } else {
-      return editModeView();
+      editorView = editModeView();
     }
+
+    return (
+      <div className="diff-editor-container">
+        {editorView}
+      </div>
+    )
   }
 
   return view();
