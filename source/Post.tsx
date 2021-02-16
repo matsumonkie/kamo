@@ -1,4 +1,4 @@
-import './post.css';
+import './css/post.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';

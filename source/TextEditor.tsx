@@ -33,17 +33,19 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
       return undefined;
     } else {
       return (
-        <Editor
-          height="10vh"
-          defaultLanguage="markdown"
-          defaultValue={model.content}
-          onChange={handleEditorChange}
-          options={
-            {
-              minimap: { enabled: false },
+        <div className="text-editor">
+          <Editor
+            height="10vh"
+            defaultLanguage="markdown"
+            defaultValue={model.content}
+            onChange={handleEditorChange}
+            options={
+              {
+                minimap: { enabled: false },
+              }
             }
-          }
-        />
+          />
+        </div>
       )
     }
   }
@@ -51,7 +53,9 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
     <>
       <div className="text-editor-container">
         {editView()}
-        <MarkdownPreview.App {...model} />
+        <div className="text-preview">
+          <MarkdownPreview.App {...model} />
+        </div>
       </div>
     </>
   );

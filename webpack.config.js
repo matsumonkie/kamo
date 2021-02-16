@@ -1,5 +1,4 @@
 const path = require('path');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const webpack = require('webpack');
 
@@ -9,11 +8,6 @@ module.exports = {
   entry: {
     server: './source/Server.ts',
     post: './source/Post.tsx',
-    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
-    'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
-    'css.worker': 'monaco-editor/esm/vs/language/css/css.worker',
-    'html.worker': 'monaco-editor/esm/vs/language/html/html.worker',
-    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
@@ -47,8 +41,5 @@ module.exports = {
   plugins: [
     new webpack.IgnorePlugin(/^pg-native$/),
     new ESLintPlugin(),
-    //new HtmlWebPackPlugin({
-    //      template: "./src/views/index.html",
-    //})
   ]
 };
