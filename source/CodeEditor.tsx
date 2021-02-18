@@ -64,16 +64,8 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
     } else {
       return (
         <div className="row">
-          <label>
-            {' '}
-      File name:
-      <input type="text" value={model.filename} onChange={updateFilename} />
-          </label>
-          <label>
-            {' '}
-      Language:
-      <input type="text" value={model.language} onChange={updateLanguage} />
-          </label>
+          <label>{' '}File name:<input type="text" value={model.filename} onChange={updateFilename} /></label>
+          <label>{' '}Language: <input type="text" value={model.language} onChange={updateLanguage} /></label>
         </div>
       );
     }

@@ -1,8 +1,4 @@
-.full-editor-container:nth-of-type(2n) {
-  
-}
-
-.full-editor-container:nth-of-type(2n+1) {
+.full-editor-container.edit-mode:nth-of-type(2n+1) {
   background-color:#F5F5F5;
 }
 
@@ -11,16 +7,16 @@
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
-
-.editor-container-toolbar {
-  height: 3rem;
+.full-editor-container.show-mode {
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;  
 }
 
 .text-editor-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
 
   margin-left: 10em;
   margin-right: 10em;
@@ -30,7 +26,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  /*align-items: center;*/
 
   margin-left: 10em;
   margin-right: 10em;
@@ -38,22 +34,32 @@
 
 .diff-editor-container {  
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
-  align-items: center;
 
   margin-left: 10em;
   margin-right: 10em;
 }
 
+.code-editor, .diff-editor {
+  border: 1px solid grey;  
+}
+
 .text-editor {
-  flex-basis: 50%;
+  flex-basis: 50rem;
 }
 .text-preview {
-  flex-basis: 50%;
+  flex-basis: 100rem;
+  font-weight: 400;
+  max-width: 700;
+  
+  line-height: 32px; 
+  font-size: 21px;
+  font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
 }
-
-
+.text-preview.edit-mode {
+  flex-basis: 50rem;
+}
 
 
 .editor {  

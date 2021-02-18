@@ -4,6 +4,7 @@ import * as CodeEditor from './CodeEditor';
 import * as TextEditor from './TextEditor';
 import * as DiffEditor from './DiffEditor';
 import * as State from './State';
+import classNames from "classnames";
 
 interface Model {
   editors: Editor.Editor[],
@@ -204,7 +205,11 @@ const App = (m: Model): JSX.Element => {
   };
 
   const editorsView = (): JSX.Element[] => model.editors.map((editor) => (
-    <div className="full-editor-container">
+    <div className={classNames({
+      'full-editor-container': true,
+      'edit-mode': model.state.type == "edit" || model.state.type == "new",
+      'show-mode': model.state.type == "show"
+    })}>
       <Editor.App
         {...model}
         {...editor}

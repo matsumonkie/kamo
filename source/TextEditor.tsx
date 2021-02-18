@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import * as MarkdownPreview from './MarkdownPreview';
 import * as State from './State';
 import * as Util from './Util';
+import classNames from "classnames";
 
 type Model = {
   type: 'text';
@@ -66,7 +67,11 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
     <>
       <div className="text-editor-container">
         {editView()}
-        <div className="text-preview">
+        <div className={classNames({
+          'text-preview': true,
+          'edit-mode': state.type == "edit" || state.type == "new",
+          'show-mode': state.type == "show"
+        })}>
           <MarkdownPreview.App {...model} />
         </div>
       </div>
