@@ -131,12 +131,11 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
     return (
       <>
         {selectFileView()}
-        <h1>{model.id}</h1>
         <div className="row">
           <Editor
             defaultLanguage="javascript"
             language={origCodeEditor.language}
-            defaultValue={previousEditor.content}
+            defaultValue={model.content}
             onChange={handleEditorChange}
             onMount={handleEditorDidMount}
             options={

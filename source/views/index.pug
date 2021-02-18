@@ -6,7 +6,7 @@ block app
       each post in posts
         li.row
           span #{post.title}
-          a(href='/post/edit/' + post.id) edit
+          a(href='/post/' + post.id + '/edit') edit
           a(href='/post/' + post.id) view
 
 block script

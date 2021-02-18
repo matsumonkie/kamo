@@ -186,7 +186,7 @@ const App = (m: Model): JSX.Element => {
       body: JSON.stringify(payload)
     })
       .then((response) => response.json())
-      .then(json => window.location.assign(`/post/edit/${json.id}`));
+      .then(json => window.location.assign(`/post/${json.id}/edit`));
   }
 
   const updateEditor: Editor.Update = {
