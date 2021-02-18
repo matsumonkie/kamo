@@ -101,10 +101,10 @@ const App = ({
     if (model.state.type != "show" && isHover) {
       return (
         <div className="row editor-container-toolbar">
-          <button onClick={onDeleteEditor}> XX</button>
-          <button onClick={() => addCodeEditor(model.id)}>Write code</button>
+          <button onClick={onDeleteEditor}> delete block</button>
+          <button onClick={() => addCodeEditor(model.id)}>Write block of code</button>
           {editCodeView()}
-          <button onClick={() => addTextEditor(model.id)}>Write Markdown</button>
+          <button onClick={() => addTextEditor(model.id)}>Write block of Markdown</button>
         </div>
       )
     } else {

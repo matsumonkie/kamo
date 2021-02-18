@@ -26,6 +26,26 @@
   margin-right: 10em;
 }
 
+.code-editor-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-left: 10em;
+  margin-right: 10em;
+}
+
+.diff-editor-container {  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-left: 10em;
+  margin-right: 10em;
+}
+
 .text-editor {
   flex-basis: 50%;
 }
@@ -33,17 +53,8 @@
   flex-basis: 50%;
 }
 
-.code-editor-container {
-  width: 100%;
-  margin-top: 50px; 
-  margin-bottom: 50px; 
-}
 
-.diff-editor-container {  
-  width: 100%;
-  margin-top: 50px; 
-  margin-bottom: 50px; 
-}
+
 
 .editor {  
   height:5rem;
