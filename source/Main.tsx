@@ -204,17 +204,19 @@ const App = (m: Model): JSX.Element => {
   };
 
   const editorsView = (): JSX.Element[] => model.editors.map((editor) => (
-    <Editor.App
-      {...model}
-      {...editor}
-      key={editor.id}
-      editors={model.editors}
-      {...updateEditor}
-      del={del}
-      addCodeEditor={addCodeEditor}
-      addDiffEditor={addDiffEditor}
-      addTextEditor={addTextEditor}
-    />
+    <div className="full-editor-container">
+      <Editor.App
+        {...model}
+        {...editor}
+        key={editor.id}
+        editors={model.editors}
+        {...updateEditor}
+        del={del}
+        addCodeEditor={addCodeEditor}
+        addDiffEditor={addDiffEditor}
+        addTextEditor={addTextEditor}
+      />
+    </div>
   ));
 
   const navBarView = (): JSX.Element => {

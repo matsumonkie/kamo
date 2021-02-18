@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import * as CodeEditor from './CodeEditor';
 import * as TextEditor from './TextEditor';
@@ -42,6 +42,8 @@ const App = ({
   update, del, addCodeEditor, addDiffEditor, addTextEditor, editors, ...model
 }: { editors: Editor[] } & Model & Delete & Update & AddDiffEditor & AddCodeEditor & AddTextEditor)
   : JSX.Element => {
+  const [isHover, setHover] = useState(false);
+
   const updateCodeEditor: CodeEditor.Update = {
     update: (newEditor: CodeEditor.Model): void => {
       update(newEditor);
@@ -87,18 +89,35 @@ const App = ({
     return undefined;
   };
 
-  const view = (): JSX.Element => (
-    <>
-      {editorView()}
-      {model.state.type != "show" &&
-        <div className="row">
+  const mouseEntered = (): void => {
+    setHover(true);
+  }
+
+  const mouseLeft = (): void => {
+    setHover(false);
+  }
+
+  const toolBarView = (): JSX.Element => {
+    if (model.state.type != "show" && isHover) {
+      return (
+        <div className="row editor-container-toolbar">
           <button onClick={onDeleteEditor}> XX</button>
           <button onClick={() => addCodeEditor(model.id)}>Write code</button>
           {editCodeView()}
           <button onClick={() => addTextEditor(model.id)}>Write Markdown</button>
         </div>
-      }
-    </>
+      )
+    } else {
+      return <div className="editor-container-toolbar" />
+    }
+
+  }
+
+  const view = (): JSX.Element => (
+    <div onMouseEnter={mouseEntered} onMouseLeave={mouseLeft}>
+      {editorView()}
+      {toolBarView()}
+    </div>
   );
 
   return view();

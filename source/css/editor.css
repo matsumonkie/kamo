@@ -1,0 +1,52 @@
+.full-editor-container:nth-of-type(2n) {
+  
+}
+
+.full-editor-container:nth-of-type(2n+1) {
+  background-color:#F5F5F5;
+}
+
+.full-editor-container {
+  width: 100%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.editor-container-toolbar {
+  height: 3rem;
+}
+
+.text-editor-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  margin-left: 10em;
+  margin-right: 10em;
+}
+
+.text-editor {
+  flex-basis: 50%;
+}
+.text-preview {
+  flex-basis: 50%;
+}
+
+.code-editor-container {
+  width: 100%;
+  margin-top: 50px; 
+  margin-bottom: 50px; 
+}
+
+.diff-editor-container {  
+  width: 100%;
+  margin-top: 50px; 
+  margin-bottom: 50px; 
+}
+
+.editor {  
+  height:5rem;
+  width: 100%; 
+}
+
