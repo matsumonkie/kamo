@@ -40,12 +40,14 @@ app.get('/index.html', async (_request, response) => {
       const title = textEditor.content.split('\n')[0]
       return {
         id: post.id,
-        title: title.replace(/^(#)/, "")
+        title: title.replace(/^(#)/, ""),
+        createdAt: post.createdAt
       }
     } else {
       return {
         id: post.id,
-        title: "no title"
+        title: "no title",
+        createdAt: post.createdAt
       }
     }
   })

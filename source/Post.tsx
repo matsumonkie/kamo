@@ -1,4 +1,3 @@
-import './css/main.css';
 import './css/editor.css';
 import './css/util.css';
 

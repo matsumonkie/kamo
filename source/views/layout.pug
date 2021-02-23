@@ -1,10 +1,9 @@
 html
   head
     title Bliff - #{title}
+    link(rel="stylesheet" href="/source/css/main.css")
   body
-    .menu: ul
-      li: a(href='/post/new') create new post
-      li: a(href='/') index
+    #menu: a(href='/') index
 
     block app
 
