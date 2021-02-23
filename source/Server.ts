@@ -4,8 +4,16 @@ import * as Config from 'config';
 import * as Pg from 'pg';
 import * as Editor from './Editor';
 import * as TextEditor from './TextEditor';
+import { BasicStrategy } from 'passport-http';
+import passport from 'passport';
+import session from 'express-session';
+import bodyParser from 'body-parser';
 
 const port = process.env.PORT;
+const login = process.env.LOGIN;
+const password = process.env.PASSWORD;
+const secret = process.env.SECRET;
+
 const app = express();
 
 app.engine('pug', require('pug').__express)
@@ -13,6 +21,31 @@ app.use(express.static('dist'));
 app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join('./source/views'));
+app.use(express.static("public"));
+app.use(session({ secret }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new BasicStrategy((huser, hpassword, done) => {
+  if (login == huser && password == hpassword) {
+    return done(null, login);
+  } else {
+    return done(null, false);
+  }
+}));
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (huser, done) {
+  if (login == huser) {
+    return done(null, login);
+  } else {
+    return done(null, false);
+  }
+});
 
 app.get('/', (_request, response) => {
   response.redirect("/index.html");
@@ -85,13 +118,13 @@ app.get('/post', async (_request, response) => {
   });
 });
 
-app.get('/post/new', (_request, response) => {
+app.get('/post/new', passport.authenticate('basic', { session: true }), (_request, response) => {
   response.render('new', {
     title: 'new'
   });
 });
 
-app.get('/post/:id/edit', (request, response) => {
+app.get('/post/:id/edit', passport.authenticate('basic', { session: true }), (request, response) => {
   const postId = request.params.id;
   response.render('edit', {
     title: `edit post ${postId}`,
@@ -99,7 +132,7 @@ app.get('/post/:id/edit', (request, response) => {
   });
 });
 
-app.post('/post', async (request, response) => {
+app.post('/post', passport.authenticate('basic', { session: true }), async (request, response) => {
   const client = new Pg.Client(Config);
   await client.connect()
   const sql = 'INSERT INTO post (body) VALUES ($1) RETURNING id;';
@@ -111,7 +144,7 @@ app.post('/post', async (request, response) => {
   response.json(id);
 })
 
-app.put('/post/:id', async (request, response) => {
+app.put('/post/:id', passport.authenticate('basic', { session: true }), async (request, response) => {
   const client = new Pg.Client(Config);
   await client.connect()
   const sql = 'UPDATE post SET body=$1 WHERE id=$2;';
@@ -124,7 +157,7 @@ app.put('/post/:id', async (request, response) => {
   response.json(nbRows);
 })
 
-app.put('/post/:id/publish', async (request, response) => {
+app.put('/post/:id/publish', passport.authenticate('basic', { session: true }), async (request, response) => {
   const client = new Pg.Client(Config);
   await client.connect()
   const sql = 'UPDATE post SET published=true WHERE id=$1;';
@@ -134,7 +167,7 @@ app.put('/post/:id/publish', async (request, response) => {
   response.json(nbRows);
 })
 
-app.put('/post/:id/unpublish', async (request, response) => {
+app.put('/post/:id/unpublish', passport.authenticate('basic', { session: true }), async (request, response) => {
   const client = new Pg.Client(Config);
   await client.connect()
   const sql = 'UPDATE post SET published=false WHERE id=$1;';

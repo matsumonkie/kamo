@@ -7,8 +7,7 @@ module.exports = {
   target: 'node',
   entry: {
     server: './source/Server.ts',
-    post: './source/Post.tsx',
-    layout: './source/Layout.tsx',
+    post: './source/Post.tsx'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
