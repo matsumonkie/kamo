@@ -1,7 +1,7 @@
 ## Build
 
 run `nix-shell`
-then `node2nix -c release.nix --nodejs-14 --development`
+then `node2nix -c release.nix --nodejs-14 --development --lock package-lock.json`
 and finally: `nix-build -A bliff --no-out-link`
 
 ## Release
