@@ -65,7 +65,7 @@
   
   line-height: 32px; 
   font-size: 21px;
-  font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 .text-preview.edit-mode {
   flex-basis: 50rem;
