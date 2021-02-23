@@ -1,6 +1,6 @@
 import express, { text } from 'express';
 import path from 'path';
-import * as Config from 'config';
+import config from 'config';
 import * as Pg from 'pg';
 import * as Editor from './Editor';
 import * as TextEditor from './TextEditor';
@@ -10,9 +10,11 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 
 const port = process.env.PORT;
-const login = process.env.LOGIN;
-const password = process.env.PASSWORD;
-const secret = process.env.SECRET;
+
+const login = config.get("auth.login");
+const password = config.get("auth.password");
+const secret = config.get("app.secret");
+const dbConfig = config.get("db");
 
 const app = express();
 
@@ -63,7 +65,7 @@ interface Body {
 }
 
 app.get('/index.html', async (_request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'SELECT * FROM post WHERE published = TRUE;';
   const posts = (await client.query(sql)).rows.map((post: Post) => {
@@ -92,7 +94,7 @@ app.get('/index.html', async (_request, response) => {
 });
 
 app.get('/post', async (_request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'SELECT * FROM post;';
   const posts = (await client.query(sql)).rows.map((post: Post) => {
@@ -133,7 +135,7 @@ app.get('/post/:id/edit', passport.authenticate('basic', { session: true }), (re
 });
 
 app.post('/post', passport.authenticate('basic', { session: true }), async (request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'INSERT INTO post (body) VALUES ($1) RETURNING id;';
   console.log(request.body)
@@ -145,7 +147,7 @@ app.post('/post', passport.authenticate('basic', { session: true }), async (requ
 })
 
 app.put('/post/:id', passport.authenticate('basic', { session: true }), async (request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'UPDATE post SET body=$1 WHERE id=$2;';
 
@@ -158,7 +160,7 @@ app.put('/post/:id', passport.authenticate('basic', { session: true }), async (r
 })
 
 app.put('/post/:id/publish', passport.authenticate('basic', { session: true }), async (request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'UPDATE post SET published=true WHERE id=$1;';
   const values = [request.params.id];
@@ -168,7 +170,7 @@ app.put('/post/:id/publish', passport.authenticate('basic', { session: true }), 
 })
 
 app.put('/post/:id/unpublish', passport.authenticate('basic', { session: true }), async (request, response) => {
-  const client = new Pg.Client(Config);
+  const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'UPDATE post SET published=false WHERE id=$1;';
   const values = [request.params.id];
@@ -185,7 +187,7 @@ app.get('/post/:id', async (request, response) => {
       postId
     });
   } else {
-    const client = new Pg.Client(Config);
+    const client = new Pg.Client(dbConfig);
     await client.connect()
     const sql = 'SELECT body, published FROM post WHERE id = $1;';
     const values = [postId];

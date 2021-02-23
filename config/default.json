@@ -1,8 +1,13 @@
 {
-  "port": 3000,
-  "user": "dev",
-  "database": "dev",
-  "login": "a",
-  "password": "a",
-  "secret": "whatever"
+  "db": {
+    "user": "dev",
+    "database": "dev"
+  },
+  "auth": {
+    "login": "a",
+    "password": "a"
+  },
+  "app": {
+    "secret": "whatever"
+  }
 }
