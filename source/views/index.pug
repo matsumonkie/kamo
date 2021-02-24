@@ -8,7 +8,3 @@ block app
           - const date = new Date(post.createdAt);
           - const dateToShow = `${ ("0" + date.getDay()).slice(-2) }/${ ("0" + (date.getMonth() + 1)).slice(-2) }/${ date.getUTCFullYear() }`;
           a(href='/post/' + post.id) #{dateToShow} - #{post.title} 
-
-block script
-  include posts
-  +posts()
