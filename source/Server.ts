@@ -23,7 +23,6 @@ app.use(express.static('dist'));
 app.use(express.json());
 app.set('view engine', 'pug');
 app.set('views', path.join('./source/views'));
-app.use(express.static("public"));
 app.use(session({ secret }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());

@@ -55,7 +55,7 @@
 }
 
 .text-editor {
-  flex-basis: 50rem;
+  width: 100%;
 }
 
 .text-preview {

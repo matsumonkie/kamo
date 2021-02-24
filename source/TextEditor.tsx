@@ -63,17 +63,27 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
       )
     }
   }
+
+  const preview = (): JSX.Element => {
+    if (state.type == "show") {
+      return (
+        <div className={classNames({
+          'text-preview': true,
+          'show-mode': true
+        })}>
+          <MarkdownPreview.App {...model} />
+        </div>
+      );
+    } else {
+      return undefined;
+    }
+  }
+
   const view = () => (
     <>
       <div className="text-editor-container">
         {editView()}
-        <div className={classNames({
-          'text-preview': true,
-          'edit-mode': state.type == "edit" || state.type == "new",
-          'show-mode': state.type == "show"
-        })}>
-          <MarkdownPreview.App {...model} />
-        </div>
+        {preview()}
       </div>
     </>
   );
