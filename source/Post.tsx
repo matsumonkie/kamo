@@ -1,6 +1,3 @@
-import './css/editor.css';
-import './css/util.css';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as Main from './Main';
