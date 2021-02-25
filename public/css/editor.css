@@ -50,8 +50,7 @@
   border: 1px solid grey;  
 }
 
-.code-editor {
-  
+.code-editor { 
 }
 
 .text-editor {
@@ -85,7 +84,6 @@
   line-height: 28px;
   font-size: 22px;
 }
-
 
 .editor {  
   height:5rem;

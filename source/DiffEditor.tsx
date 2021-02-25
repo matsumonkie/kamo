@@ -75,9 +75,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
     const height = { minHeight: 100, maxHeight: 500 }
-    editor.onDidContentSizeChange(() => {
-      Util.updateEditorHeight(height, editor)
-    });
+    editor.onDidContentSizeChange(() => Util.updateEditorHeight(height, editor));
     Util.updateEditorHeight(height, editor);
   }
 
@@ -157,7 +155,8 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
     const height = Math.min(currentHeight, 700);
 
     return (
-      <>
+      <div className="col">
+        <section>{origCodeEditor.filename}</section>
         <DiffEditor
           className="diff-editor"
           height={height}
@@ -174,7 +173,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
             }
           }
         />
-      </>
+      </div>
     );
   }
 
