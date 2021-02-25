@@ -14,7 +14,6 @@ const updateDiffEditorHeight = (width: number, { minHeight, maxHeight }: heightS
   const origHeight = editor.getOriginalEditor().getContentHeight()
   const modHeight = editor.getModifiedEditor().getContentHeight()
   const contentHeight = Math.max(minHeight, Math.min(maxHeight, Math.max(origHeight, modHeight)));
-  console.log(`diff width/height ${width}/${contentHeight}`)
   editor.layout({
     width: width,
     height: contentHeight

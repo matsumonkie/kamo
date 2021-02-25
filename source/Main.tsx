@@ -32,7 +32,6 @@ const getModelForPostId = (postId: number, isShowMode: boolean): Promise<Model> 
     .then((json) => {
       const { published, ...modelWithoutState } = json
 
-      console.log(`1 ${isShowMode}`)
       if (isShowMode) {
         return {
           ...modelWithoutState,

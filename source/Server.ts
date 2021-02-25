@@ -137,7 +137,6 @@ app.post('/post', passport.authenticate('basic', { session: true }), async (requ
   const client = new Pg.Client(dbConfig);
   await client.connect()
   const sql = 'INSERT INTO post (body) VALUES ($1) RETURNING id;';
-  console.log(request.body)
 
   const values = [request.body];
   const id = (await client.query(sql, values)).rows[0];
@@ -151,8 +150,6 @@ app.put('/post/:id', passport.authenticate('basic', { session: true }), async (r
   const sql = 'UPDATE post SET body=$1 WHERE id=$2;';
 
   const values = [request.body, request.params.id];
-  console.log(JSON.stringify({ sql, body: request.body, id: request.params.id }, null, 2))
-
   const nbRows = (await client.query(sql, values)).rows[0];
 
   response.json(nbRows);

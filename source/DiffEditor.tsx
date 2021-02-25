@@ -11,6 +11,7 @@ type Model = {
   id: number;
   content: string;
   previousEditorId: number;
+  splitMode: boolean;
 }
 
 type DiffableEditor =
@@ -24,6 +25,7 @@ const mkModel = (id: number, previousEditorId: number, content: string): Model =
   id,
   content,
   previousEditorId,
+  splitMode: true
 });
 
 interface Update {
@@ -103,6 +105,14 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
     update(newModel);
   };
 
+  const toggleSplitMode = (): void => {
+    const newModel: Model = {
+      ...model,
+      splitMode: !model.splitMode,
+    };
+    update(newModel);
+  };
+
   const selectFileView = (): JSX.Element => {
     const options: JSX.Element[] = diffableEditors.map((diffableEditor) => (
       <option
@@ -113,39 +123,37 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
       </option>
     ));
 
-    if (diffableEditors.length === 0) {
-      console.error('Wuuut?! You tried to open a diff editor without any code to diff against... This should never happen...');
-      return null;
-    }
     return (
-      <>
+      <div className="row">
         <select onChange={onChangeFile} value={model.previousEditorId}>{options}</select>
-      </>
+        <label>{' '}Split view:<input type="checkbox" defaultChecked={model.splitMode} onChange={toggleSplitMode} /></label>
+      </div>
     );
   };
-
 
   const editModeView = (): JSX.Element => {
     return (
       <>
-        {selectFileView()}
-        <div className="row">
-          <Editor
-            defaultLanguage="javascript"
-            language={origCodeEditor.language}
-            defaultValue={model.content}
-            onChange={handleEditorChange}
-            onMount={handleEditorDidMount}
-            options={
-              {
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                scrollBeyondLastColumn: 1
+        <div className="col">
+          {selectFileView()}
+          <div className="row">
+            <Editor
+              defaultLanguage="javascript"
+              language={origCodeEditor.language}
+              defaultValue={model.content}
+              onChange={handleEditorChange}
+              onMount={handleEditorDidMount}
+              options={
+                {
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  scrollBeyondLastColumn: 1
+                }
               }
-            }
-          />
+            />
 
-          {showModeView()}
+            {showModeView()}
+          </div>
         </div>
       </>
     );
@@ -166,6 +174,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
           onMount={handleDiffEditorDidMount}
           options={
             {
+              renderSideBySide: model.splitMode,
               readOnly: true,
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
