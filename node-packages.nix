@@ -4135,6 +4135,15 @@ let
         sha512 = "F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==";
       };
     };
+    "highlight.js-10.6.0" = {
+      name = "highlight.js";
+      packageName = "highlight.js";
+      version = "10.6.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/highlight.js/-/highlight.js-10.6.0.tgz";
+        sha512 = "8mlRcn5vk/r4+QcqerapwBYTe+iPL5ih6xrNylxrnBdHQiijDETfXX7VIxC3UiCRiINBJfANBAsPzAvRQj8RpQ==";
+      };
+    };
     "hmac-drbg-1.0.1" = {
       name = "hmac-drbg";
       packageName = "hmac-drbg";
@@ -10392,6 +10401,7 @@ let
       sources."hash-base-3.1.0"
       sources."hash.js-1.1.7"
       sources."he-1.2.0"
+      sources."highlight.js-10.6.0"
       sources."hmac-drbg-1.0.1"
       sources."homedir-polyfill-1.0.3"
       sources."hosted-git-info-2.8.8"
