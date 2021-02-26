@@ -3,6 +3,9 @@
 Kamo is a simple blog platform which makes use of the [monaco-editor](github.com/microsoft/monaco-editor/).
 It allows you to create article with an embedded diff viewer.
 
+![Image of Yaktocat](./demo.png)
+
+
 ## Build
 
 run `nix-shell`
