@@ -21,7 +21,7 @@ let
 
   derivation =
     with pkgs; {
-      name = "bliff";
+      name = "kamo";
       buildInputs = with pkgs; [ nodejs-14_x ];
       phases = ["unpackPhase" "buildPhase"];
       src = [
@@ -50,5 +50,5 @@ let
 in
 {
   nodejs = pkgs.nodejs-14_x;
-  bliff = pkgs.stdenv.mkDerivation derivation;
+  kamo = pkgs.stdenv.mkDerivation derivation;
 }

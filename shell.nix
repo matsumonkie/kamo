@@ -10,7 +10,7 @@ let
   in import pinnedPkgs {};
 
 in pkgs.mkShell {
-  name = "bliff";
+  name = "kamo";
   buildInputs = with pkgs; [
     nodePackages.node2nix
     nodejs

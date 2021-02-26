@@ -9600,8 +9600,8 @@ let
     };
   };
   args = {
-    name = "bliff";
-    packageName = "bliff";
+    name = "kamo";
+    packageName = "kamo";
     version = "0.1.0";
     src = ./.;
     dependencies = [
