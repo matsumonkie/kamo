@@ -86,6 +86,7 @@ app.get('/index.html', async (_request, response) => {
     }
   })
 
+  client.end();
   response.render('index', {
     title: 'index',
     posts
@@ -113,6 +114,7 @@ app.get('/post', async (_request, response) => {
     }
   })
 
+  client.end();
   response.render('index', {
     title: 'index',
     posts
@@ -141,6 +143,7 @@ app.post('/post', passport.authenticate('basic', { session: true }), async (requ
   const values = [request.body];
   const id = (await client.query(sql, values)).rows[0];
 
+  client.end();
   response.json(id);
 })
 
@@ -152,6 +155,7 @@ app.put('/post/:id', passport.authenticate('basic', { session: true }), async (r
   const values = [request.body, request.params.id];
   const nbRows = (await client.query(sql, values)).rows[0];
 
+  client.end();
   response.json(nbRows);
 })
 
@@ -162,6 +166,7 @@ app.put('/post/:id/publish', passport.authenticate('basic', { session: true }), 
   const values = [request.params.id];
   const nbRows = (await client.query(sql, values)).rows[0];
 
+  client.end();
   response.json(nbRows);
 })
 
@@ -172,6 +177,7 @@ app.put('/post/:id/unpublish', passport.authenticate('basic', { session: true })
   const values = [request.params.id];
   const nbRows = (await client.query(sql, values)).rows[0];
 
+  client.end();
   response.json(nbRows);
 })
 
@@ -189,6 +195,7 @@ app.get('/post/:id', async (request, response) => {
     const values = [postId];
 
     const { body, published } = (await client.query(sql, values)).rows[0];
+    client.end();
     response.json({
       editors: body.editors,
       published
