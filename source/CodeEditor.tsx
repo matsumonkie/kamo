@@ -114,20 +114,23 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
       }
     } else {
       return (
-        <Editor
-          height={height}
-          className="code-editor"
-          language={model.language}
-          defaultValue={model.content}
-          onChange={handleEditorChange}
-          onMount={handleEditorDidMount}
-          options={
-            {
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false
+        <>
+          <h1>{model.id}</h1>
+          <Editor
+            height={height}
+            className="code-editor"
+            language={model.language}
+            defaultValue={model.content}
+            onChange={handleEditorChange}
+            onMount={handleEditorDidMount}
+            options={
+              {
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false
+              }
             }
-          }
-        />
+          />
+        </>
       );
     }
   }

@@ -45,18 +45,30 @@ const findOrigCodeEditor = (previousEditorId: number, editors: MEditor.Editor[])
 };
 
 const getDiffableEditors = (editors: MEditor.Editor[]): DiffableEditor[] => {
-  const findLatestDiffEditorId = (origCodeEditorId: number): number => editors.reduce((acc, editor) => {
-    if (isDiffEditor(editor) && editor.previousEditorId == acc && editor.previousEditorId != origCodeEditorId) {
-      return editor.id;
-    }
-    return acc;
-  }, origCodeEditorId);
+
+  const findLatestDiffEditor = (origCodeEditorId: number): Model => {
+    const [lastId, mDiffEditor] = editors.reduce(([lastId, mDiffEditor], editor) => {
+      if (isDiffEditor(editor) && editor.previousEditorId == lastId) {
+        return [editor.id, editor];
+      }
+      return [lastId, mDiffEditor];
+    }, [origCodeEditorId, undefined]);
+
+    return mDiffEditor;
+  }
 
   return editors.reduce((acc, editor) => {
     if (isCodeEditor(editor)) {
+
+      const latestDiffEditor = findLatestDiffEditor(editor.id);
+      let latestDiffEditorId: number = undefined
+      if (latestDiffEditor && latestDiffEditor.previousEditorId != editor.id) {
+        latestDiffEditorId = latestDiffEditor.id;
+      }
+
       const diffableEditor = {
         codeEditor: editor,
-        latestDiffEditorId: findLatestDiffEditorId(editor.id),
+        latestDiffEditorId: latestDiffEditorId,
       };
 
       return acc.concat([diffableEditor]);
@@ -119,13 +131,13 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
         key={diffableEditor.latestDiffEditorId}
         value={diffableEditor.codeEditor.id}
       >
-        {`${diffableEditor.codeEditor.filename} ${diffableEditor.codeEditor.id}`}
+        {diffableEditor.codeEditor.filename}
       </option>
     ));
 
     return (
       <div className="row">
-        <select onChange={onChangeFile} value={model.previousEditorId}>{options}</select>
+        <select onChange={onChangeFile} value={origCodeEditor.id}>{options}</select>
         <label>{' '}Split view:<input type="checkbox" defaultChecked={model.splitMode} onChange={toggleSplitMode} /></label>
       </div>
     );
@@ -134,6 +146,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
   const editModeView = (): JSX.Element => {
     return (
       <>
+        <h1>{model.id}</h1>
         <div className="col">
           {selectFileView()}
           <div className="row">
