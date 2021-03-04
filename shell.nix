@@ -12,7 +12,6 @@ let
 in pkgs.mkShell {
   name = "kamo";
   buildInputs = with pkgs; [
-    nodePackages.node2nix
     nodejs
   ];
 }

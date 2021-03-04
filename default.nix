@@ -1,7 +1,6 @@
 let
-  hostPkgs = import <nixpkgs> {};
-  release = hostPkgs.lib.importJSON ./release.json;
   pkgs = let
+    hostPkgs = import <nixpkgs> {};
     pinnedVersion = hostPkgs.lib.importJSON ./nixpkgs-version.json;
     pinnedPkgs = hostPkgs.fetchFromGitHub {
       owner = "NixOS";
@@ -10,19 +9,41 @@ let
     };
   in import pinnedPkgs {};
 
+  node2NixFiles = srcPath:
+    pkgs.stdenv.mkDerivation {
+      name = "node2NixFiles";
+      nativeBuildInputs = [ pkgs.nodejs pkgs.nodePackages.node2nix ];
+      src = srcPath;
+      phases = [ "unpackPhase" "buildPhase" "installPhase" ];
+      unpackPhase = ''
+        cp $src/package.json $src/package-lock.json .
+      '';
+      buildPhase = ''
+        node2nix --lock package-lock.json --development
+      '';
+      installPhase = ''
+        mkdir $out
+        cp node-env.nix node-packages.nix default.nix $out/
+        cp package.json package-lock.json $out/
+      '';
+    };
+
+  dependencies = import (node2NixFiles ./.) { inherit pkgs; };
+
   eslintrc = builtins.path { path = ./.eslintrc.js;
                              name = "eslintrc";
                            };
 
   srcs = pkgs.lib.sourceFilesBySuffices ./source [ ".js" ".ts" ".tsx" ".css" ".pug" ];
 
-  nodeDependencies =
-    (pkgs.callPackage ./release.nix { inherit pkgs; }).shell.nodeDependencies;
-
   derivation =
     with pkgs; {
       name = "kamo";
-      buildInputs = with pkgs; [ nodejs-14_x ];
+      buildInputs = [
+        pkgs.nodejs-14_x
+        pkgs.nodePackages.webpack
+        pkgs.nodePackages.webpack-cli
+      ];
       phases = ["unpackPhase" "buildPhase"];
       src = [
         eslintrc
@@ -38,12 +59,13 @@ let
         for srcFile in $src; do
           cp -r $srcFile $(stripHash $srcFile)
         done
+        cp -r ${dependencies.nodeDependencies}/lib/node_modules .
       '';
 
       buildPhase = ''
-        ln -s ${nodeDependencies}/lib/node_modules ./node_modules
-        export PATH="${nodeDependencies}/bin:$PATH"
-        webpack
+        echo 12
+        ls node_modules/webpack
+        ${nodejs}/bin/npx webpack
         cp -r dist $out/
       '';
     };

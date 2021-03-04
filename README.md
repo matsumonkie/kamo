@@ -8,9 +8,9 @@ It allows you to create article with an embedded diff viewer.
 
 ## Build
 
-run `nix-shell`
-then `node2nix -c release.nix --nodejs-14 --development --lock package-lock.json`
-and finally: `nix-build -A kamo --no-out-link`
+You'll need [nix](https://nixos.org/download.html) if you want reproducible build. Then just `make install`
+
+If you'd rather work with common nodejs tools, just `npm install`. Then You'll need to run `npm run build`.
 
 ## Release
 
