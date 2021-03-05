@@ -2,6 +2,7 @@ import React, { MutableRefObject, useRef, useState } from 'react';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import Editor, { DiffEditor } from '@monaco-editor/react';
 import * as CodeEditor from './CodeEditor';
+import * as MDiffEditor from './DiffEditor';
 import * as MEditor from './Editor';
 import * as State from './State';
 import * as Util from './Util';
@@ -10,21 +11,15 @@ type Model = {
   type: 'diff';
   id: number;
   content: string;
-  previousEditorId: number;
+  codeEditorId: number;
   splitMode: boolean;
 }
 
-type DiffableEditor =
-  {
-    codeEditor: CodeEditor.Model,
-    latestDiffEditorId?: number
-  }
-
-const mkModel = (id: number, previousEditorId: number, content: string): Model => ({
+const mkModel = (id: number, codeEditorId: number, content: string): Model => ({
   type: 'diff',
   id,
   content,
-  previousEditorId,
+  codeEditorId,
   splitMode: true
 });
 
@@ -32,71 +27,53 @@ interface Update {
   update: (model: Model) => void
 }
 
-const isCodeEditor = (editor: MEditor.Editor): editor is CodeEditor.Model => editor.type === 'code';
-
-const isDiffEditor = (editor: MEditor.Editor): editor is Model => editor.type === 'diff';
-
-const findOrigCodeEditor = (previousEditorId: number, editors: MEditor.Editor[]): CodeEditor.Model => {
-  const previousEditor = editors.find((editor) => editor.id == previousEditorId) as CodeEditor.Model | Model;
-  if (isDiffEditor(previousEditor)) {
-    return findOrigCodeEditor(previousEditor.previousEditorId, editors);
-  }
-  return previousEditor as CodeEditor.Model;
-};
-
-const getDiffableEditors = (editors: MEditor.Editor[]): DiffableEditor[] => {
-
-  const findLatestDiffEditor = (origCodeEditorId: number): Model => {
-    const [lastId, mDiffEditor] = editors.reduce(([lastId, mDiffEditor], editor) => {
-      if (isDiffEditor(editor) && editor.previousEditorId == lastId) {
-        return [editor.id, editor];
+const getPreviousDiffEditors = (editors: MEditor.Editor[], origCodeEditorId: number, beforeId: number): Model[] => {
+  const [_, res] = editors.reduce(([isBeforeEditor, res], editor) => {
+    if (isBeforeEditor && editor.id != beforeId) {
+      if (MEditor.isDiffEditor(editor) && editor.codeEditorId == origCodeEditorId) {
+        return [true, res.concat(editor)]
+      } else {
+        return [true, res];
       }
-      return [lastId, mDiffEditor];
-    }, [origCodeEditorId, undefined]);
-
-    return mDiffEditor;
-  }
-
-  return editors.reduce((acc, editor) => {
-    if (isCodeEditor(editor)) {
-
-      const latestDiffEditor = findLatestDiffEditor(editor.id);
-      let latestDiffEditorId: number = undefined
-      if (latestDiffEditor && latestDiffEditor.previousEditorId != editor.id) {
-        latestDiffEditorId = latestDiffEditor.id;
-      }
-
-      const diffableEditor = {
-        codeEditor: editor,
-        latestDiffEditorId: latestDiffEditorId,
-      };
-
-      return acc.concat([diffableEditor]);
+    } else {
+      return [false, res];
     }
-    return acc;
-  }, []);
-};
+  }, [true, []])
 
-const App = ({ update, editors, state, ...model }: { state: State.Model } & { editors: MEditor.Editor[] } & Model & Update): JSX.Element => {
+  return res;
+}
+
+const findLatestDiffEditor = (editors: MEditor.Editor[], origCodeEditorId: number, beforeId: number): Model => {
+  const previousDiffEditors = getPreviousDiffEditors(editors, origCodeEditorId, beforeId)
+  return previousDiffEditors[previousDiffEditors.length - 1];
+}
+
+type PreviousEditor =
+  | CodeEditor.Model
+  | MDiffEditor.Model
+
+const App = ({ update, editors, state, previousCodeEditors, ...model }:
+  Update & { editors: MEditor.Editor[] } & { state: State.Model } & { previousCodeEditors: CodeEditor.Model[] } & Model): JSX.Element => {
   const [currentHeight, setHeight] = useState(100);
-  const origCodeEditor: CodeEditor.Model = findOrigCodeEditor(model.previousEditorId, editors);
-  const previousEditor = editors.find((editor) => editor.id == model.previousEditorId) as CodeEditor.Model | Model;
-  const diffableEditors: DiffableEditor[] = getDiffableEditors(editors);
 
-  const editorRef: MutableRefObject<monaco.editor.IStandaloneCodeEditor> = useRef(null);
-  const diffEditorRef: MutableRefObject<monaco.editor.IStandaloneDiffEditor> = useRef(null);
+  const origCodeEditor: CodeEditor.Model = editors.find(editor => editor.id == model.codeEditorId) as CodeEditor.Model;
+  const previousDiffEditor: MDiffEditor.Model = findLatestDiffEditor(editors, model.codeEditorId, model.id);
+  const previousEditor: PreviousEditor = previousDiffEditor ? previousDiffEditor : origCodeEditor;
+
+  const monacoEditorRef: MutableRefObject<monaco.editor.IStandaloneCodeEditor> = useRef(null);
+  const monacoDiffEditorRef: MutableRefObject<monaco.editor.IStandaloneDiffEditor> = useRef(null);
 
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
-    editorRef.current = editor;
+    monacoEditorRef.current = editor;
     const height = { minHeight: 100, maxHeight: 500 }
     editor.onDidContentSizeChange(() => Util.updateEditorHeight(height, editor));
     Util.updateEditorHeight(height, editor);
   }
 
   function handleDiffEditorDidMount(editor: monaco.editor.IStandaloneDiffEditor) {
-    diffEditorRef.current = editor;
-    const origHeight: number = diffEditorRef.current.getOriginalEditor().getContentHeight();
-    const modHeight: number = diffEditorRef.current.getModifiedEditor().getContentHeight();
+    monacoDiffEditorRef.current = editor;
+    const origHeight: number = monacoDiffEditorRef.current.getOriginalEditor().getContentHeight();
+    const modHeight: number = monacoDiffEditorRef.current.getModifiedEditor().getContentHeight();
     const newHeight: number = Math.max(origHeight, modHeight);
     setHeight(newHeight);
   }
@@ -112,7 +89,7 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
   const onChangeFile = (event) => {
     const newModel: Model = {
       ...model,
-      previousEditorId: event.target.value,
+      codeEditorId: event.target.value
     };
     update(newModel);
   };
@@ -126,18 +103,15 @@ const App = ({ update, editors, state, ...model }: { state: State.Model } & { ed
   };
 
   const selectFileView = (): JSX.Element => {
-    const options: JSX.Element[] = diffableEditors.map((diffableEditor) => (
-      <option
-        key={diffableEditor.latestDiffEditorId}
-        value={diffableEditor.codeEditor.id}
-      >
-        {diffableEditor.codeEditor.filename}
+    const options: JSX.Element[] = previousCodeEditors.map((codeEditor) => (
+      <option key={codeEditor.id} value={codeEditor.id}>
+        {codeEditor.filename}
       </option>
     ));
 
     return (
       <div className="row">
-        <select onChange={onChangeFile} value={origCodeEditor.id}>{options}</select>
+        <select onChange={onChangeFile} value={model.codeEditorId}>{options}</select>
         <label>{' '}Split view:<input type="checkbox" defaultChecked={model.splitMode} onChange={toggleSplitMode} /></label>
       </div>
     );

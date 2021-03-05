@@ -11,7 +11,7 @@ interface Model {
   state: State.Model
 }
 
-const mkId = (): number => Math.floor(Math.random() * Math.floor(1000));
+const mkId = (): number => Math.floor(Math.random() * Math.floor(100000));
 
 const defaultModel = (): Model => {
   return {
@@ -56,7 +56,7 @@ const getModelForPostId = (postId: number, isShowMode: boolean): Promise<Model> 
 const removeEditorAndItsChildren = (editors: Editor.Editor[], id: number): Editor.Model[] => editors.reduce((acc, editor) => {
   if (editor.id == id) {
     return acc;
-  } if ('previousEditorId' in editor && editor.previousEditorId == id) {
+  } if (Editor.isDiffEditor(editor) && editor.codeEditorId == id) {
     return {
       editors: acc.editors,
       idToDelete: editor.id,
@@ -109,8 +109,11 @@ const App = (m: Model): JSX.Element => {
     });
   };
 
-  const addDiffEditor = (previousEditorId: number, lastCodeEditor: CodeEditor.Model | DiffEditor.Model): void => {
-    const newEditor: DiffEditor.Model = DiffEditor.mkModel(mkId(), lastCodeEditor.id, lastCodeEditor.content);
+  const addDiffEditor = (previousEditorId: number): void => {
+    const editors = (model.editors.filter((editor) => editor.type === 'code' || editor.type === 'diff'));
+    const editor = editors[editors.length - 1]
+
+    const newEditor: DiffEditor.Model = DiffEditor.mkModel(mkId(), editor.id, editor.content);
     setModel({
       ...model,
       editors: insertAfterEditorId(previousEditorId, model.editors, newEditor),
@@ -199,7 +202,7 @@ const App = (m: Model): JSX.Element => {
         return editor;
       });
       const newModel = { ...model, editors: newEditors };
-      console.log(`update from app ${JSON.stringify(newModel, null, 2)}`);
+      //console.log(`update from app ${JSON.stringify(newModel, null, 2)}`);
       setModel(newModel);
     },
   };

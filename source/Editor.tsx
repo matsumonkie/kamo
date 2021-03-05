@@ -4,6 +4,7 @@ import * as CodeEditor from './CodeEditor';
 import * as TextEditor from './TextEditor';
 import * as DiffEditor from './DiffEditor';
 import * as State from './State';
+import Editor from '@monaco-editor/react';
 
 type Editor =
   | TextEditor.Model
@@ -12,7 +13,9 @@ type Editor =
 
 type Model = Editor & { state: State.Model }
 
+const isCodeEditor = (editor: Editor): editor is CodeEditor.Model => editor.type === 'code';
 const isTextEditor = (editor: Editor): editor is TextEditor.Model => editor.type === 'text';
+const isDiffEditor = (editor: Editor): editor is DiffEditor.Model => editor.type === 'diff';
 
 interface Delete {
   del: (id: number) => void
@@ -31,7 +34,7 @@ interface AddCodeEditor {
 }
 
 interface AddDiffEditor {
-  addDiffEditor: (id: number, lastCodeEditor: CodeEditor.Model | DiffEditor.Model) => void
+  addDiffEditor: (id: number) => void
 }
 
 interface AddTextEditor {
@@ -43,6 +46,22 @@ const App = ({
 }: { editors: Editor[] } & Model & Delete & Update & AddDiffEditor & AddCodeEditor & AddTextEditor)
   : JSX.Element => {
   const [isHover, setHover] = useState(false);
+
+  const getPreviousCodeEditors = (): CodeEditor.Model[] => {
+    const [_, res] = editors.reduce(([isBeforeEditor, res], editor) => {
+      if (isBeforeEditor && editor.id != model.id) {
+        if (isCodeEditor(editor)) {
+          return [true, res.concat(editor)]
+        } else {
+          return [true, res];
+        }
+      } else {
+        return [false, res];
+      }
+    }, [true, []])
+
+    return res;
+  }
 
   const updateCodeEditor: CodeEditor.Update = {
     update: (newEditor: CodeEditor.Model): void => {
@@ -75,18 +94,12 @@ const App = ({
         return <TextEditor.App {...model} {...updateTextEditor} />;
 
       case 'diff':
-        return <DiffEditor.App {...model} editors={editors} {...updateDiffEditor} />;
+        return <DiffEditor.App {...model} editors={editors} {...updateDiffEditor} previousCodeEditors={getPreviousCodeEditors()} />;
     }
   };
 
   const editCodeView = (): JSX.Element => {
-    const codeEditors = editors.filter((editor) => editor.type === 'code' || editor.type === 'diff') as CodeEditor.Model[];
-
-    if (codeEditors.length > 0) {
-      const lastCodeEditor = codeEditors[codeEditors.length - 1];
-      return (<button onClick={() => addDiffEditor(model.id, lastCodeEditor)}>Edit code</button>);
-    }
-    return undefined;
+    return (<button onClick={() => addDiffEditor(model.id)}>Edit code</button>);
   };
 
   const mouseEntered = (): void => {
@@ -124,5 +137,5 @@ const App = ({
 };
 
 export {
-  App, Editor, Model, Delete, Update, AddTextEditor, AddCodeEditor, AddDiffEditor, isTextEditor
+  App, Editor, Model, Delete, Update, AddTextEditor, AddCodeEditor, AddDiffEditor, isTextEditor, isDiffEditor, isCodeEditor
 };
