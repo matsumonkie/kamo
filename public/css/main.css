@@ -26,3 +26,8 @@ body {
   margin-top: 1em;
   margin-bottom: 1em;
 } 
+
+#app > .list-post {
+  display: flex;
+  flex-direction: column;
+}

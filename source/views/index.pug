@@ -2,9 +2,8 @@ extends layout.pug
 
 block app
   #app
-    ul
+    .list-post
       each post in posts
-        li.row
-          - const date = new Date(post.createdAt);
-          - const dateToShow = `${ ("0" + date.getDay()).slice(-2) }/${ ("0" + (date.getMonth() + 1)).slice(-2) }/${ date.getUTCFullYear() }`;
-          a(href='/post/' + post.id) #{dateToShow} - #{post.title} 
+        - const date = new Date(post.createdAt);
+        - const dateToShow = `${ ("0" + date.getDay()).slice(-2) }/${ ("0" + (date.getMonth() + 1)).slice(-2) }/${ date.getUTCFullYear() }`;
+        a(href='/post/' + post.id) #{dateToShow} - #{post.title} 
