@@ -66,7 +66,7 @@ interface Body {
 app.get('/index.html', async (_request, response) => {
   const client = new Pg.Client(dbConfig);
   await client.connect()
-  const sql = 'SELECT * FROM post WHERE published = TRUE;';
+  const sql = 'SELECT * FROM post WHERE published = TRUE ORDER BY "createdAt" ASC;';
   const posts = (await client.query(sql)).rows.map((post: Post) => {
     const textEditor = post.body.editors.find((editor) => editor.type == "text") as TextEditor.Model;
 
