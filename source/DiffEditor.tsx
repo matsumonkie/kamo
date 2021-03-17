@@ -120,7 +120,6 @@ const App = ({ update, editors, state, previousCodeEditors, ...model }:
   const editModeView = (): JSX.Element => {
     return (
       <>
-        <h1>{model.id}</h1>
         <div className="col">
           {selectFileView()}
           <div className="row">

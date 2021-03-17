@@ -120,7 +120,7 @@ const App = ({
           <button onClick={() => addTextEditor(model.id)}>Write block of Markdown</button>
         </div>
       )
-    } else {
+    } else if (model.state.type != "show") {
       return <div className="editor-container-toolbar" />
     }
 

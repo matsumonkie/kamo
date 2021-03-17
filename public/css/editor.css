@@ -9,10 +9,15 @@
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
-.full-editor-container.show-mode {
-  width: 100%;
+.full-editor-container.show-mode {  
   padding-top: 5px;
   padding-bottom: 5px;  
+}
+
+/* editor toolbar */
+.editor-container-toolbar {
+  margin-top: 5px;
+  height: 20px;
 }
 
 /* editor container */

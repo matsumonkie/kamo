@@ -115,7 +115,6 @@ const App = ({ update, state, ...model }: { state: State.Model } & Model & Updat
     } else {
       return (
         <>
-          <h1>{model.id}</h1>
           <Editor
             height={height}
             className="code-editor"
