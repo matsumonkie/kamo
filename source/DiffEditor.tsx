@@ -87,9 +87,13 @@ const App = ({ update, editors, state, previousCodeEditors, ...model }:
   };
 
   const onChangeFile = (event) => {
+    const codeEditorId = event.target.value;
+    const latestDiffEditor = findLatestDiffEditor(editors, codeEditorId, model.id);
+    const latestContent = latestDiffEditor ? latestDiffEditor.content : editors.find(editor => editor.id == codeEditorId).content
     const newModel: Model = {
       ...model,
-      codeEditorId: event.target.value
+      codeEditorId: codeEditorId,
+      content: latestContent
     };
     update(newModel);
   };
@@ -126,7 +130,7 @@ const App = ({ update, editors, state, previousCodeEditors, ...model }:
             <Editor
               defaultLanguage="javascript"
               language={origCodeEditor.language}
-              defaultValue={model.content}
+              value={model.content}
               onChange={handleEditorChange}
               onMount={handleEditorDidMount}
               options={

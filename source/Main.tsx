@@ -110,7 +110,7 @@ const App = (m: Model): JSX.Element => {
   };
 
   const addDiffEditor = (previousEditorId: number): void => {
-    const editors = (model.editors.filter((editor) => editor.type === 'code' || editor.type === 'diff'));
+    const editors = (model.editors.filter((editor) => editor.type === 'code'));
     const editor = editors[editors.length - 1]
 
     const newEditor: DiffEditor.Model = DiffEditor.mkModel(mkId(), editor.id, editor.content);
